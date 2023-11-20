@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://cjr8k4gaauij6"]
+
+[ext_resource type="Script" path="res://art/spaceship/player.gd" id="1_8p5ax"]
+[ext_resource type="Texture2D" uid="uid://ux5jnv44fov2" path="res://art/spaceship/spaceship.1.png" id="2_b7odx"]
+[ext_resource type="Texture2D" uid="uid://dgsv52ug75kcu" path="res://art/spaceship/spaceship.2.png" id="3_kivf0"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_s67if"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_b7odx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_kivf0")
+}],
+"loop": true,
+"name": &"fly",
+"speed": 5.0
+}]
+
+[node name="Player" type="Area2D"]
+position = Vector2(612, 416)
+script = ExtResource("1_8p5ax")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_s67if")
+animation = &"fly"
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+visible = false
+polygon = PackedVector2Array(-6, 0, -1, -16, 1, -16, 6, 0, 14, 10, 5, 12, 0, 14, -5, 12, -14, 10)
