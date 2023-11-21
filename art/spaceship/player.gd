@@ -5,6 +5,7 @@ extends RigidBody2D
 @export var rotation_torque = 20000
 @export var base_mass = 1000
 @export var max_angular_velocity = 3
+signal hit
 
 func _ready():
 	set_gravity_scale(0)
@@ -47,25 +48,9 @@ func _physics_process(delta):#
 	if force_vector != Vector2.ZERO:
 		apply_central_impulse(force_vector)
 		
-#	print(angular_velocity)
-	# acceleration
-#	if Input.is_action_pressed("accelerate"):
-#		speed_radial += force_radial * delta
-#	elif Input.is_action_pressed("decelerate"):
-#		speed_radial -= force_radial * delta
-
-#	if Input.is_action_pressed("drift_right") or (autocorrect and not drifting and speed_tangential < 0):
-#		speed_tangential += force_tangential * delta
-#	elif Input.is_action_pressed("drift_left") or (autocorrect and not drifting and speed_tangential > 0):
-#		speed_tangential -= force_tangential * delta
-#
-#	speed_radial = clamp(speed_radial, -0.2*top_speed_radial, top_speed_radial)
-#	speed_tangential = clamp(speed_tangential, -top_speed_tangential, top_speed_tangential)
-#
-#	var velocity = Vector2(speed_radial*cos(rotation)-speed_tangential*sin(rotation), 
-#							speed_radial*sin(rotation)+speed_tangential*cos(rotation))
-#
-#	position += velocity * delta
-#	position = position.clamp(Vector2.ZERO, screen_size)
 	$AnimatedSprite2D.play()
 
+
+
+func _on_body_entered(body):
+	pass # Replace with function body.

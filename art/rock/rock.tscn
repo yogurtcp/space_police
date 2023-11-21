@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3 uid="uid://b8jvk1n0wg2td"]
+
+[ext_resource type="Script" path="res://art/rock/rock.gd" id="1_40n1r"]
+[ext_resource type="Texture2D" uid="uid://bp3a71n6fagmy" path="res://art/rock/rock_0.png" id="1_jd41t"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fywkc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_jd41t")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="rock" type="RigidBody2D"]
+mass = 100.0
+gravity_scale = 0.0
+script = ExtResource("1_40n1r")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-1, 2)
+sprite_frames = SubResource("SpriteFrames_fywkc")
+metadata/_edit_group_ = true
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(35, -43)
+polygon = PackedVector2Array(-47, 43, -29, 32, -22, 44, -40, 55)
+metadata/_edit_group_ = true
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+metadata/_edit_group_ = true
