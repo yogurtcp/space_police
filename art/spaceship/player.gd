@@ -1,68 +1,71 @@
-extends Area2D
+extends RigidBody2D
 
-@export var acceleration_radial = 600
-@export var top_speed_radial = 400
-var speed_radial = 0
+@export var force_radial = 8000
+@export var force_tangential = 6000
+@export var rotation_torque = 20000
+@export var base_mass = 1000
+@export var max_angular_velocity = 3
 
-@export var acceleration_tangential = 600
-@export var top_speed_tangential = 300
-var speed_tangential = 0
-
-@export var acceleration_rotation = deg_to_rad(720)
-@export var top_speed_rotation = deg_to_rad(180)
-var speed_rotation = 0
-
-
-
-var angle = 0
-var screen_size # Size of the game window.
-
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	screen_size = get_viewport_rect().size
-	pass # Replace with function body.
-
-
+	set_gravity_scale(0)
+	mass = base_mass
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):#	
+func _physics_process(delta):#	
 
 	var autocorrect = true
-	
+
 	# roataion
 	var rotating = Input.is_action_pressed("rotate_right") or Input.is_action_pressed("rotate_left")
 	var drifting = Input.is_action_pressed("drift_right") or Input.is_action_pressed("drift_left")
 	
-	if Input.is_action_pressed("rotate_right") or (autocorrect and not rotating and speed_rotation < 0):
-		speed_rotation += acceleration_rotation * delta
-	elif Input.is_action_pressed("rotate_left") or (autocorrect and not rotating and speed_rotation > 0):
-		speed_rotation -= acceleration_rotation * delta
-	
-	speed_rotation = clamp(speed_rotation, -top_speed_rotation, top_speed_rotation) 
-	rotation += speed_rotation* delta
-	
-	# acceleration
-	if Input.is_action_pressed("accelerate"):
-		speed_radial += acceleration_radial * delta
-	elif Input.is_action_pressed("decelerate"):
-		speed_radial -= acceleration_radial * delta
-	
-	if Input.is_action_pressed("drift_right") or (autocorrect and not drifting and speed_tangential < 0):
-		speed_tangential += acceleration_tangential * delta
-	elif Input.is_action_pressed("drift_left") or (autocorrect and not drifting and speed_tangential > 0):
-		speed_tangential -= acceleration_tangential * delta
-	
-	speed_radial = clamp(speed_radial, -0.2*top_speed_radial, top_speed_radial)
-	speed_tangential = clamp(speed_tangential, -top_speed_tangential, top_speed_tangential)
-	
-	var velocity = Vector2(speed_radial*cos(rotation)-speed_tangential*sin(rotation), 
-							speed_radial*sin(rotation)+speed_tangential*cos(rotation))
-								
-	position += velocity * delta
-	position = position.clamp(Vector2.ZERO, screen_size)
-	
-#	print("speed_radial: " + str(speed_radial))
-#	print("velocity: " + str(velocity))
-#	print("position: " + str(position))
+	if abs(angular_velocity) < max_angular_velocity:
+		if Input.is_action_pressed("rotate_right") or (autocorrect and not rotating and angular_velocity < 0):
+			apply_torque_impulse(rotation_torque)
+			
+		elif Input.is_action_pressed("rotate_left") or (autocorrect and not rotating and angular_velocity > 0):
+			apply_torque_impulse(-rotation_torque)
 
+	var force_vector = Vector2.ZERO
+
+	# Forward and Backward forces
+	if Input.is_action_pressed("accelerate"):
+		force_vector += Vector2(cos(rotation), sin(rotation)) * force_radial
+	elif Input.is_action_pressed("decelerate"):
+		force_vector -= Vector2(cos(rotation), sin(rotation)) * force_radial
+	
+	var tangent_direction = Vector2(sin(rotation), -cos(rotation))
+	var tangent_velocity = tangent_direction.dot(linear_velocity)
+	
+	# Left and Right forces
+	if Input.is_action_pressed("drift_right") or (autocorrect and not drifting and tangent_velocity > 0):
+		force_vector += Vector2(cos(rotation + PI/2), sin(rotation + PI/2)) * force_tangential
+	elif Input.is_action_pressed("drift_left") or (autocorrect and not drifting and tangent_velocity < 0):
+		force_vector += Vector2(cos(rotation - PI/2), sin(rotation - PI/2)) * force_tangential
+
+	# Apply the force
+	if force_vector != Vector2.ZERO:
+		apply_central_impulse(force_vector)
+		
+#	print(angular_velocity)
+	# acceleration
+#	if Input.is_action_pressed("accelerate"):
+#		speed_radial += force_radial * delta
+#	elif Input.is_action_pressed("decelerate"):
+#		speed_radial -= force_radial * delta
+
+#	if Input.is_action_pressed("drift_right") or (autocorrect and not drifting and speed_tangential < 0):
+#		speed_tangential += force_tangential * delta
+#	elif Input.is_action_pressed("drift_left") or (autocorrect and not drifting and speed_tangential > 0):
+#		speed_tangential -= force_tangential * delta
+#
+#	speed_radial = clamp(speed_radial, -0.2*top_speed_radial, top_speed_radial)
+#	speed_tangential = clamp(speed_tangential, -top_speed_tangential, top_speed_tangential)
+#
+#	var velocity = Vector2(speed_radial*cos(rotation)-speed_tangential*sin(rotation), 
+#							speed_radial*sin(rotation)+speed_tangential*cos(rotation))
+#
+#	position += velocity * delta
+#	position = position.clamp(Vector2.ZERO, screen_size)
 	$AnimatedSprite2D.play()
 
